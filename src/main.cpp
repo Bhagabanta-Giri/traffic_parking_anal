@@ -2,12 +2,11 @@
 #include <Servo.h>
 #include <LiquidCrystal.h>
 
-// --- Pin Definitions ---
-// LCD Display
+
 LiquidCrystal lcd(12, 11, 7, 6, 5, 4);
 
-// Ultrasonic Sensors
-const int mastertrig = 13; // Common trigger for all sensors
+
+const int mastertrig = 13; 
 const int echo1 = A0;
 const int echo2 = A1;
 const int echo3 = A2;
@@ -60,12 +59,13 @@ void setup() {
   pinMode(echo5, INPUT);
   pinMode(echo6, INPUT);
   
-  // Initialize LED Pins
+
   pinMode(greenLED, OUTPUT);
   pinMode(yellowLED, OUTPUT);
   pinMode(redLED, OUTPUT);
   
-  // Emergency Interrupt
+
+  
   pinMode(emergencyBtn, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(emergencyBtn), triggerEmergency, FALLING);
   
@@ -74,7 +74,6 @@ void setup() {
 }
 
 
-// Function to read ultrasonic sensors reliably
 long readDistance(int trig, int echo) {
   digitalWrite(trig, LOW); delayMicroseconds(2);
   digitalWrite(trig, HIGH); delayMicroseconds(10);
@@ -87,7 +86,6 @@ long readDistance(int trig, int echo) {
 void loop() {
   unsigned long currentMillis = millis();
 
-  // --- 1. EMERGENCY OVERRIDE ---
   if (emergencyMode) {
     digitalWrite(redLED, LOW);
     digitalWrite(yellowLED, LOW);
