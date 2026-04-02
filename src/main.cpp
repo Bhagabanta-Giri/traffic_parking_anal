@@ -65,7 +65,7 @@ void setup() {
   pinMode(redLED, OUTPUT);
   
 
-  
+
   pinMode(emergencyBtn, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(emergencyBtn), triggerEmergency, FALLING);
   
@@ -120,11 +120,11 @@ void loop() {
 
   unsigned long timeElapsed = currentMillis - previousMillis;
   
-  if (trafficState == 0 && timeElapsed >= redDuration) {
+  if (trafficState == 0 && timeElapsed >= redDuration && !isFull) {
     trafficState = 1; // Move to Yellow
     previousMillis = currentMillis;
     timeElapsed = 0;
-  } 
+  }
   else if (trafficState == 1 && timeElapsed >= yellowDuration) {
     trafficState = 2; // Move to Green
     previousMillis = currentMillis;
@@ -140,16 +140,19 @@ void loop() {
   digitalWrite(redLED, trafficState == 0 ? HIGH : LOW);
   digitalWrite(yellowLED, trafficState == 1 ? HIGH : LOW);
   if (trafficState == 2) {
-    if (availableSlots >= 2) { // Only show green if there are at least 2 slots available
+    if (availableSlots > 2) { // Only show green if there are at least 3 slots available
       digitalWrite(greenLED, HIGH);
-    } else {
-      if ((millis() / 500) % 2 == 0) {
+    } 
+    if (availableSlots <= 2 && availableSlots > 0) {
+      if ((millis() / 250) % 2 == 0) {
         digitalWrite(greenLED, HIGH); // Blink green to indicate limited availability
-      } else {
+      } 
+      else {
         digitalWrite(greenLED, LOW);
       }
     }
-  } else {
+  } 
+  else {
     digitalWrite(greenLED, LOW);
   }
 
