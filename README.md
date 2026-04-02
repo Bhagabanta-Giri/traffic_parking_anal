@@ -1,25 +1,46 @@
 # Smart Parking and Emergency Priority Traffic System
 
 ## Introduction
-In modern urban environments, inefficient parking management and rigid traffic control systems contribute significantly to congestion and delays. Drivers often spend excessive time searching for available parking spaces, while emergency vehicles like ambulances face critical delays due to unresponsive traffic signals. This project proposes a cohesive solution: a Smart Parking and Emergency Priority Traffic System. By integrating real-time parking availability tracking with an intelligent, priority-aware traffic light and gate control system, this project aims to optimize parking space utilization, reduce traffic congestion, and ensure uninterrupted passage for emergency vehicles.
+In modern urban environments, inefficient parking management and rigid traffic control systems contribute significantly to congestion and delays. Drivers often spend excessive time searching for available parking spaces, while emergency vehicles like ambulances face critical delays due to unresponsive traffic signals. 
 
-## Overview of Components
-* **Arduino Microcontroller:** The main processing unit that reads sensor data, manages the traffic state machine, and controls output devices.
-* **Ultrasonic Sensors (1x Master Trigger, 6x Echo Pins):** Used to continuously monitor 6 individual parking slots by measuring the distance to any parked vehicle.
-* **Servo Motor:** Acts as the entry gate mechanism, rotating to allow or restrict vehicle access based on traffic lights and parking availability.
-* **16x2 LCD Display:** Provides a real-time, user-friendly interface displaying the current number of open parking slots and the operational status of the gate (e.g., OPENING, FULL, EMERGENCY).
-* **LEDs (Red, Yellow, Green):** Simulates a real-world traffic light system to control the flow of incoming vehicles.
-* **Push Button:** Acts as an emergency trigger, wired to a hardware interrupt pin to instantly override the normal system flow.
+This project proposes a cohesive solution: a Smart Parking and Emergency Priority Traffic System. By integrating real-time parking availability tracking with an intelligent, priority-aware traffic light and gate control system, this project aims to optimize parking space utilization, reduce traffic congestion, and ensure uninterrupted passage for emergency vehicles.
 
-## Working Explanation
-The system operates using a state machine and a hardware interrupt to coordinate three main subsystems: parking monitoring, traffic flow, and emergency response.
+## Key Features
+* **Real-Time Capacity Tracking:** Monitors 6 independent parking slots simultaneously using an optimized shared-trigger ultrasonic array.
+* **Dynamic Gate Actuation:** Gate opening speed is mapped to the yellow traffic light phase for realistic, gradual mechanical movement.
+* **Smart Traffic State Machine:** Traffic lights automatically lock on Red if the lot reaches maximum capacity, preventing gridlock.
+* **Low Capacity Warning:** The green traffic light blinks to visually warn approaching drivers when 1 or fewer slots remain.
+* **Instant Emergency Override:** A hardware interrupt allows emergency vehicles to bypass the timer, instantly turning the light green and forcing the gate open for 5 seconds.
 
-1. **Automated Parking Management:** A master trigger pin pulses 6 distinct ultrasonic echo pins. The distance returned determines if a car is present. The system calculates the total available slots and continuously updates the 16x2 LCD display.
-2. **Intelligent Traffic and Gate Control:** A time-based state machine manages the Red (3s), Yellow (1s), and Green (3s) traffic lights. 
+## Hardware Components
+* **1x Arduino Uno (ATmega328P):** The main processing unit.
+* **6x Ultrasonic Sensors (HC-SR04):** To monitor individual parking slots.
+* **1x Micro Servo Motor:** Acts as the physical entry gate.
+* **1x 16x2 LCD Display:** Provides a real-time user interface.
+* **3x LEDs (Red, Yellow, Green):** Simulates the incoming traffic light.
+* **1x Push Button:** Triggers the emergency override.
+
+## System Architecture & Logic
+The system operates using a non-blocking state machine (utilizing `millis()`) and a hardware interrupt to coordinate three main subsystems:
+
+1. **Automated Parking Management:** A single master trigger pin pulses 6 distinct ultrasonic echo pins. The distance returned determines if a car is present. The system calculates the total available slots and continuously updates the LCD.
+2. **Intelligent Traffic Control:** A time-based state machine manages the Red (3s), Yellow (1s), and Green (3s) traffic lights. 
     * **Red Light:** Gate remains fully closed.
-    * **Yellow Light:** *Custom Feature* - The gate opens dynamically and gradually, mapping the elapsed time to a servo angle (0 to 90 degrees) for a realistic transition.
-    * **Green Light:** Gate opens fully (90 degrees). *Custom Feature* - If available slots drop below 2, the Green LED will flash to warn drivers of limited space. If the lot is entirely full, the gate is overridden and stays locked shut regardless of the light.
-3. **Emergency Traffic Control:** The push button is attached to a hardware interrupt pin (FALLING edge). Pressing it instantly halts the main loop, forces the Red and Yellow LEDs off, turns the Green LED on, throws the gate to 90 degrees, and displays an emergency warning on the LCD for 5 seconds to allow an ambulance to pass without delay.
+    * **Yellow Light:** The gate opens dynamically, mapping the elapsed time to a servo angle (0 to 90 degrees) for a smooth transition.
+    * **Green Light:** Gate opens fully. If available slots drop below 2, the Green LED flashes. If the lot is completely full, the state machine locks on Red and the gate shuts.
+3. **Emergency Override:** The push button is attached to a hardware interrupt pin. Pressing it instantly halts the main loop, forces the Red and Yellow LEDs off, turns the Green LED on, throws the gate wide open, and displays an emergency warning on the LCD for 5 seconds.
 
-## TinkerCAD Simulation Link
+## Installation & Setup (PlatformIO)
+This project is built using C++ and the [PlatformIO](https://platformio.org/) ecosystem. 
+1. Clone this repository to your local machine.
+2. Open the folder in VS Code with the PlatformIO extension installed.
+3. The `platformio.ini` file will automatically download the required `Servo` and `LiquidCrystal` dependencies.
+4. Click **Build** and **Upload** to flash to your Arduino Uno.
+
+## Simulation
+Don't have the hardware on hand? You can view and interact with the circuit logic in the browser:
 [View the Live Simulation on TinkerCAD](https://www.tinkercad.com/things/5ExLHbw6Ioi-task1cyb063125bm0019?sharecode=MpuWPpEsLFCWLO7VDTsg15oTWtn2YtRpdwyARP_OiUo)
+
+
+## Author
+**Bhagabanta Giri** *B.Tech, Biomedical Engineering* **NIT Rourkela**
