@@ -6,12 +6,14 @@
 // LCD Display
 LiquidCrystal lcd(12, 11, 7, 6, 5, 4);
 
-// Parking Sensors (Slots 1 & 2)
-const int trig1 = A0, echo1 = A1;
-const int trig2 = A2, echo2 = A3;
-
-// Parking Sensors (Slots 3 & 4 - Sharing Pin 13 for Trigger)
-const int trig3_4 = 13, echo3 = A4, echo4 = A5;
+// Ultrasonic Sensors
+const int mastertrig = 13; // Common trigger for all sensors
+const int echo1 = A0;
+const int echo2 = A1;
+const int echo3 = A2;
+const int echo4 = A3;
+const int echo5 = A4;
+const int echo6 = A5;
 
 // Gate Servo
 Servo gateServo;
@@ -50,10 +52,13 @@ void setup() {
   gateServo.write(0); // Start closed
   
   // Initialize Sensor Pins
-  pinMode(trig1, OUTPUT); pinMode(echo1, INPUT);
-  pinMode(trig2, OUTPUT); pinMode(echo2, INPUT);
-  pinMode(trig3_4, OUTPUT); 
-  pinMode(echo3, INPUT); pinMode(echo4, INPUT);
+  pinMode(mastertrig, OUTPUT); 
+  pinMode(echo1, INPUT);
+  pinMode(echo2, INPUT);
+  pinMode(echo3, INPUT);
+  pinMode(echo4, INPUT);
+  pinMode(echo5, INPUT);
+  pinMode(echo6, INPUT);
   
   // Initialize LED Pins
   pinMode(greenLED, OUTPUT);
@@ -99,21 +104,22 @@ void loop() {
     return; 
   }
 
-  // --- 2. PARKING SLOT CHECK (4 SLOTS) ---
   int availableSlots = 0;
-  if (readDistance(trig1, echo1) > 50) availableSlots++;
-  if (readDistance(trig2, echo2) > 50) availableSlots++;
-  if (readDistance(trig3_4, echo3) > 50) availableSlots++;
-  if (readDistance(trig3_4, echo4) > 50) availableSlots++;
+  if (readDistance(mastertrig, echo1) > 50) availableSlots++;
+  if (readDistance(mastertrig, echo2) > 50) availableSlots++;
+  if (readDistance(mastertrig, echo3) > 50) availableSlots++;
+  if (readDistance(mastertrig, echo4) > 50) availableSlots++;
+  if (readDistance(mastertrig, echo5) > 50) availableSlots++;
+  if (readDistance(mastertrig, echo6) > 50) availableSlots++;
   
   bool isFull = (availableSlots == 0);
 
   lcd.setCursor(0, 0);
   lcd.print("Slots Open: ");
   lcd.print(availableSlots);
-  lcd.print("/4 ");
+  lcd.print("/6 ");
 
-  // --- 3. TRAFFIC STATE MACHINE ---
+
   unsigned long timeElapsed = currentMillis - previousMillis;
   
   if (trafficState == 0 && timeElapsed >= redDuration) {
@@ -135,7 +141,19 @@ void loop() {
   // Update LEDs based on current state
   digitalWrite(redLED, trafficState == 0 ? HIGH : LOW);
   digitalWrite(yellowLED, trafficState == 1 ? HIGH : LOW);
-  digitalWrite(greenLED, trafficState == 2 ? HIGH : LOW);
+  if (trafficState == 2) {
+    if (availableSlots >= 2) { // Only show green if there are at least 2 slots available
+      digitalWrite(greenLED, HIGH);
+    } else {
+      if ((millis() / 500) % 2 == 0) {
+        digitalWrite(greenLED, HIGH); // Blink green to indicate limited availability
+      } else {
+        digitalWrite(greenLED, LOW);
+      }
+    }
+  } else {
+    digitalWrite(greenLED, LOW);
+  }
 
   // --- 4. GATE LOGIC (Depends on Lot Capacity AND Traffic Light) ---
   lcd.setCursor(0, 1);
