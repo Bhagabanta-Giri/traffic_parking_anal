@@ -14,27 +14,23 @@ const int echo4 = A3;
 const int echo5 = A4;
 const int echo6 = A5;
 
-// Gate Servo
 Servo gateServo;
 const int servoPin = 3;
 
-// Traffic Lights
 const int greenLED = 8;
 const int yellowLED = 9;
 const int redLED = 10;
 
-// Emergency Button
 const int emergencyBtn = 2;
 
-// --- Global Variables ---
 volatile bool emergencyMode = false; 
 unsigned long previousMillis = 0;
-int trafficState = 0; // 0=Red, 1=Yellow, 2=Green
+int trafficState = 0;
 
-// --- Adjusted Timings (in milliseconds) ---
-const unsigned long redDuration = 3000;    // Increased Red time
-const unsigned long yellowDuration = 1000; // Decreased Yellow time
-const unsigned long greenDuration = 3000;  // Increased Green time
+
+const unsigned long redDuration = 3000;
+const unsigned long yellowDuration = 1000;
+const unsigned long greenDuration = 3000;
 
 
 // Hardware Interrupt for Instant Emergency Response
@@ -48,9 +44,9 @@ void setup() {
   lcd.print("System Updating");
   
   gateServo.attach(servoPin);
-  gateServo.write(0); // Start closed
+  gateServo.write(0);
   
-  // Initialize Sensor Pins
+
   pinMode(mastertrig, OUTPUT); 
   pinMode(echo1, INPUT);
   pinMode(echo2, INPUT);
@@ -90,14 +86,14 @@ void loop() {
     digitalWrite(redLED, LOW);
     digitalWrite(yellowLED, LOW);
     digitalWrite(greenLED, HIGH);
-    gateServo.write(90); // Throw gate wide open for emergency
+    gateServo.write(90);
     
     lcd.setCursor(0, 0); lcd.print("EMERGENCY MODE! ");
     lcd.setCursor(0, 1); lcd.print("Gate: FORCED OP ");
     
-    delay(5000); // Hold for 5 seconds
+    delay(5000);
     emergencyMode = false;
-    previousMillis = millis(); // Reset timer so we don't jump states
+    previousMillis = millis();
     lcd.clear();
     return; 
   }
@@ -136,16 +132,15 @@ void loop() {
     timeElapsed = 0;
   }
 
-  // Update LEDs based on current state
   digitalWrite(redLED, trafficState == 0 ? HIGH : LOW);
   digitalWrite(yellowLED, trafficState == 1 ? HIGH : LOW);
   if (trafficState == 2) {
-    if (availableSlots > 2) { // Only show green if there are at least 3 slots available
+    if (availableSlots > 2) {
       digitalWrite(greenLED, HIGH);
     } 
     if (availableSlots <= 2 && availableSlots > 0) {
       if ((millis() / 250) % 2 == 0) {
-        digitalWrite(greenLED, HIGH); // Blink green to indicate limited availability
+        digitalWrite(greenLED, HIGH);
       } 
       else {
         digitalWrite(greenLED, LOW);
