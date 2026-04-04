@@ -156,24 +156,18 @@ void loop() {
     digitalWrite(greenLED, LOW);
   }
 
-  // --- 4. GATE LOGIC (Depends on Lot Capacity AND Traffic Light) ---
   lcd.setCursor(0, 1);
   
   if (isFull) {
-    // If lot is completely full, gate strictly closes
     gateServo.write(0);
     lcd.print("Gate: LOT FULL  ");
   } 
-  else {
-    // Lot has space, so gate follows traffic light
-    if (trafficState == 0) {
+  else {    if (trafficState == 0) {
       // Red Light
       gateServo.write(0);
       lcd.print("Gate: RED STOP  ");
     } 
     else if (trafficState == 1) {
-      // Yellow Light - Slow opening logic
-      // Maps the elapsed time (0 to 2000ms) to a servo angle (0 to 90 degrees)
       int currentAngle = map(timeElapsed, 0, yellowDuration, 0, 90);
       gateServo.write(constrain(currentAngle, 0, 90));
       lcd.print("Gate: OPENING...");
