@@ -1,11 +1,11 @@
+# Unit Testing Suite
 
-This directory is intended for PlatformIO Test Runner and project tests.
+This project uses the **Unity** framework for automated testing. Tests are isolated to ensure the system is bulletproof.
 
-Unit Testing is a software testing method by which individual units of
-source code, sets of one or more MCU program modules together with associated
-control data, usage procedures, and operating procedures, are tested to
-determine whether they are fit for use. Unit testing finds problems early
-in the development cycle.
+### Test Categories
+- **`test_police`**: Validates the state machine transitions and the 5-second emergency override without needing hardware.
+- **`test_hardware`**: Verifies that sensor data is correctly mapped to slot availability (can be run with the board connected).
 
-More information about PlatformIO Unit Testing:
-- https://docs.platformio.org/en/latest/advanced/unit-testing/index.html
+### How to Run
+Execute the following in the PlatformIO Core CLI:
+`pio test -e uno`
