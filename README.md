@@ -30,6 +30,11 @@ The system operates using a non-blocking state machine (utilizing `millis()`) an
     * **Green Light:** Gate opens fully. If available slots drop below 2, the Green LED flashes. If the lot is completely full, the state machine locks on Red and the gate shuts.
 3. **Emergency Override:** The push button is attached to a hardware interrupt pin. Pressing it instantly halts the main loop, forces the Red and Yellow LEDs off, turns the Green LED on, throws the gate wide open, and displays an emergency warning on the LCD for 5 seconds.
 
+##Code Organisation:
+1. All constants are in include folder.
+2. All utilities are in the library folder.
+3. Main source code includes only the logic.
+
 ## Installation & Setup (PlatformIO)
 This project is built using C++ and the [PlatformIO](https://platformio.org/) ecosystem. 
 1. Clone this repository to your local machine.
